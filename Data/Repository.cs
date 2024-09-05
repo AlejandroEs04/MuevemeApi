@@ -22,7 +22,6 @@ public class Repository<T> : IRepository<T> where T : class
     {
         return await _dbSet.FindAsync(id);
     }
-
     public async Task<bool> AddAsync(T entity)
     {
         await _dbSet.AddAsync(entity);
