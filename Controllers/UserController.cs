@@ -24,9 +24,14 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<User> GetUsers()
+    public IEnumerable<UserGetDto> GetUsers()
     {
-        return _dapper.FindMany<User>("SELECT * FROM [User]");
+        string sqlGetUsers = @"
+            SELECT 
+                Id, Name, LastName, Email, PhoneNumber, UserName, PorfileImageUrl
+            FROM [MuevemeSchema].[User]
+        ";
+        return _dapper.FindMany<UserGetDto>(sqlGetUsers);
     }
 
     [HttpPost]
@@ -37,7 +42,7 @@ public class UserController : ControllerBase
         }
 
         string sqlExistsUser = @$"
-            SELECT * FROM dbo.[User]
+            SELECT * FROM [MuevemeSchema].[User]
             WHERE Email = '{user.Email}' OR 
             PhoneNumber = '{user.PhoneNumber}' OR 
             UserName = '{user.UserName}' 
@@ -59,7 +64,7 @@ public class UserController : ControllerBase
         byte[] passwordHash = _authHelper.GetPasswordHash(user.Password, passwordSalt);
 
         string sqlAddUser = @$"
-            INSERT INTO dbo.[User] (Name, LastName, Email, PhoneNumber, UserName, PasswordHash, PasswordSalt)
+            INSERT INTO [MuevemeSchema].[User] (Name, LastName, Email, PhoneNumber, UserName, PasswordHash, PasswordSalt)
             VALUES ('{user.Name}', '{user.LastName}', '{user.Email}', '{user.PhoneNumber}', '{user.UserName}', @PasswordHash, @PasswordSalt)
         ";
 
@@ -82,12 +87,79 @@ public class UserController : ControllerBase
         return Ok();
     }
 
-    [HttpPut]
-    public IActionResult UpdateUser(UserUpdateDto user) 
+    [HttpPut("{userId}")]
+    public IActionResult UpdateUser(int userId, UserUpdateDto user) 
     {   
-        string sqlUpdateUser = @"
-            UPDATE 
+        string sqlExistsUser = @$"
+            SELECT * FROM [MuevemeSchema].[User]
+            WHERE 
+                (
+                    Email = '{user.Email}' OR 
+                    PhoneNumber = '{user.PhoneNumber}' OR 
+                    UserName = '{user.UserName}' 
+                ) AND 
+                Id != {userId}
         ";
+
+        IEnumerable<User> existsUser = _dapper.FindMany<User>(sqlExistsUser); 
+
+        if(existsUser.Count() > 0) 
+        {
+            throw new Exception("Another account already exists with this email, phone number or user name");
+        }
+
+        string sqlUpdateUser = @"
+            UPDATE [MuevemeSchema].[User]
+            SET 
+                Name = '" + user.Name  + @"', 
+                LastName = '" + user.LastName  + @"', 
+                Email = '" + user.Email  + @"', 
+                PhoneNumber = '" + user.PhoneNumber  + @"', 
+                UserName = '" + user.UserName  + @"', 
+                PorfileImageUrl = '" + user.PorfileImageUrl  + @"'
+        ";
+
+        if(user.NewPassword.Length > 0) {
+            byte[] passwordSalt = new byte[129/8];
+            using(RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            {
+                rng.GetNonZeroBytes(passwordSalt);
+            }
+
+            byte[] passwordHash = _authHelper.GetPasswordHash(user.NewPassword, passwordSalt);
+
+            sqlUpdateUser += @"
+                , PasswordHash = @PasswordHash, 
+                PasswordSalt = @PasswordSalt
+            ";
+
+            List<SqlParameter> sqlParameters = new List<SqlParameter>();
+
+            SqlParameter passwordSaltParameter = new SqlParameter("@PasswordSalt", SqlDbType.VarBinary);
+            passwordSaltParameter.Value = passwordSalt;
+
+            SqlParameter passwordHashParameter = new SqlParameter("@PasswordHash", SqlDbType.VarBinary);
+            passwordHashParameter.Value = passwordHash;
+
+            sqlParameters.Add(passwordSaltParameter);
+            sqlParameters.Add(passwordHashParameter);
+
+            sqlUpdateUser += " WHERE Id = " + userId.ToString();
+
+            if(!_dapper.ExecuteSqlParameters(sqlUpdateUser, sqlParameters))
+            {
+                throw new Exception("Failed to update user");
+            }
+
+            return Ok();
+        }
+
+        sqlUpdateUser += " WHERE Id = " + userId.ToString();
+
+        if(!_dapper.ExecuteSql(sqlUpdateUser)) 
+        {
+            throw new Exception("Failed to update user");
+        }
 
         return Ok();
     }
