@@ -81,4 +81,14 @@ public class UserController : ControllerBase
 
         return Ok();
     }
+
+    [HttpPut]
+    public IActionResult UpdateUser(UserUpdateDto user) 
+    {   
+        string sqlUpdateUser = @"
+            UPDATE 
+        ";
+
+        return Ok();
+    }
 }
