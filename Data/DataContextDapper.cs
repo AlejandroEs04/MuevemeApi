@@ -20,7 +20,7 @@ class DataContextDapper
 
     public T FindOne<T>(string sql)
     {
-        IDbConnection dbConnection = new SqlConnection(_config.GetConnectionString("DefaultConnetion"));
+        IDbConnection dbConnection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
         return dbConnection.QuerySingle<T>(sql);
     }
 

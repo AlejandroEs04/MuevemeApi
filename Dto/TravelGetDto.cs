@@ -1,6 +1,6 @@
-namespace MuevemeApi.Models;
+namespace MuevemeApi.Dtos;
 
-public class Travel 
+public class TravelGetDto 
 {
     public int Id { get; set; }
     public int UserId { get; set; }
@@ -10,4 +10,5 @@ public class Travel
     public string FromCoordinates { get; set; } = "";
     public string ToCoordinates { get; set; }  = "";
     public decimal Price { get; set; }
+    public IEnumerable<DayTravelDto>? ActiveDays { get; set; }
 }

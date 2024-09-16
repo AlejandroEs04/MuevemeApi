@@ -1,6 +1,7 @@
 using System.Data;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using MuevemeApi.Data;
@@ -10,6 +11,7 @@ using MuevemeApi.Utils;
 
 namespace MuevemeApi.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class UserController : ControllerBase
@@ -26,14 +28,27 @@ public class UserController : ControllerBase
     [HttpGet]
     public IEnumerable<UserGetDto> GetUsers()
     {
+        string userId = User.FindFirst("userId")?.Value + "";
+
+        string sqlGetRolId = $"SELECT RolId FROM [MuevemeSchema].[User] WHERE Id = {userId}";
+
+        int rolId = _dapper.FindOne<int>(sqlGetRolId);
+
+        if(rolId != 3)
+        {
+            throw new Exception("ERROR, Access Denied");
+        }
+
         string sqlGetUsers = @"
             SELECT 
-                Id, Name, LastName, Email, PhoneNumber, UserName, PorfileImageUrl
-            FROM [MuevemeSchema].[User]
+                U.Id, U.Name, U.LastName, U.Email, U.PhoneNumber, U.UserName, U.PorfileImageUrl, R.Description AS Rol, U.RolId
+            FROM [MuevemeSchema].[User] AS U
+            INNER JOIN [MuevemeSchema].[Rol] AS R ON R.Id = U.RolId
         ";
         return _dapper.FindMany<UserGetDto>(sqlGetUsers);
     }
 
+    [AllowAnonymous]
     [HttpPost]
     public IActionResult AddUser(UserCreateDto user)
     {
@@ -87,9 +102,11 @@ public class UserController : ControllerBase
         return Ok();
     }
 
-    [HttpPut("{userId}")]
-    public IActionResult UpdateUser(int userId, UserUpdateDto user) 
+    [HttpPut]
+    public IActionResult UpdateUser(UserUpdateDto user) 
     {   
+        string userId = User.FindFirst("userId")?.Value + "";
+
         string sqlExistsUser = @$"
             SELECT * FROM [MuevemeSchema].[User]
             WHERE 
@@ -116,6 +133,7 @@ public class UserController : ControllerBase
                 Email = '" + user.Email  + @"', 
                 PhoneNumber = '" + user.PhoneNumber  + @"', 
                 UserName = '" + user.UserName  + @"', 
+                RolId = '" + user.RolId  + @"', 
                 PorfileImageUrl = '" + user.PorfileImageUrl  + @"'
         ";
 

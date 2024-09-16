@@ -48,7 +48,7 @@ namespace MuevemeApi.Utils
                 {
                     Subject = new ClaimsIdentity(claims),
                     SigningCredentials = credentials, 
-                    Expires = DateTime.Now.AddDays(60)
+                    Expires = DateTime.Now.AddDays(90)
                 };
 
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();

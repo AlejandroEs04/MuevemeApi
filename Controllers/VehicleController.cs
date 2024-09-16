@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MuevemeApi.Dtos;
 using MuevemeApi.Data;
 using MuevemeApi.Models;
 
 namespace MuevemeApi.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class VehicleController : ControllerBase
@@ -14,19 +17,23 @@ public class VehicleController : ControllerBase
     {
         _dapper = new DataContextDapper(config);
     }
-
+    
     [HttpGet]
     public IEnumerable<Vehicle> GetVehicles()
     {
-        return _dapper.FindMany<Vehicle>("SELECT * FROM [MuevemeSchema].[Vehicle]");
+        string userId = User.FindFirst("userId")?.Value + "";
+
+        return _dapper.FindMany<Vehicle>($"SELECT * FROM [MuevemeSchema].[Vehicle] WHERE UserId = {userId}");
     }
 
     [HttpPost]
-    public IActionResult AddVehicle(Vehicle vehicle) 
+    public IActionResult AddVehicle(VehicleDto vehicle) 
     {
+        string userId = User.FindFirst("userId")?.Value + "";
+
         string sqlAddVehicle = @$"
-            INSERT INTO [MuevemeSchema].[Vehicle] (Id, UserId, Model, Color, Year)
-            Values ('{vehicle.Id}', {vehicle.UserId}, '{vehicle.Model}', '{vehicle.Color}', {vehicle.Year})
+            INSERT INTO [MuevemeSchema].[Vehicle] (Plates, UserId, Model, Color, Year)
+            Values ('{vehicle.Plates}', {userId}, '{vehicle.Model}', '{vehicle.Color}', {vehicle.Year})
         ";
 
         if(!_dapper.ExecuteSql(sqlAddVehicle)) 
@@ -38,11 +45,12 @@ public class VehicleController : ControllerBase
     }  
 
     [HttpPut("{vehicleId}")]
-    public IActionResult UpdateVehicle(string vehicleId, Vehicle vehicle)
+    public IActionResult UpdateVehicle(int vehicleId, VehicleDto vehicle)
     {
         string sqlUpdateVehicle = @$"
             UPDATE [MuevemeSchema].[Vehicle]
             SET 
+                Plates = '{vehicle.Plates}', 
                 Model = '{vehicle.Model}', 
                 Color = '{vehicle.Color}', 
                 Year = {vehicle.Year}
