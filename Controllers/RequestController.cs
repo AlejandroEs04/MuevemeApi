@@ -34,8 +34,6 @@ public class RequestController : ControllerBase
             VALUES ({request.TravelId}, {userId}, 0, 1, '{request.Stop}', GETDATE())
         ";
 
-        Console.WriteLine(sqlAddRequest);
-
         if(!_dapper.ExecuteSql(sqlAddRequest))
         {
             throw new Exception("Failed to create request");
