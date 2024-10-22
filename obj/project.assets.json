@@ -2545,11 +2545,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\2004e\\Desktop\\Development\\Software Development\\MuevemeApi\\MuevemeApi.csproj",
+      "projectUniqueName": "E:\\Users\\Default\\Documents\\Development Projects\\Software Development\\MuevemeAPI\\MuevemeApi.csproj",
       "projectName": "MuevemeApi",
-      "projectPath": "C:\\Users\\2004e\\Desktop\\Development\\Software Development\\MuevemeApi\\MuevemeApi.csproj",
+      "projectPath": "E:\\Users\\Default\\Documents\\Development Projects\\Software Development\\MuevemeAPI\\MuevemeApi.csproj",
       "packagesPath": "C:\\Users\\2004e\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\2004e\\Desktop\\Development\\Software Development\\MuevemeApi\\obj\\",
+      "outputPath": "E:\\Users\\Default\\Documents\\Development Projects\\Software Development\\MuevemeAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -2564,6 +2564,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -2576,6 +2577,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -2638,7 +2644,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

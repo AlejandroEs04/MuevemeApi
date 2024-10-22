@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MuevemeApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e56a73e356469fd7caf6bc0622100d1574061c2c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0c1e526628ce81a2c857aaa7a1c4bed3b23e9518")]
 [assembly: System.Reflection.AssemblyProductAttribute("MuevemeApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MuevemeApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -41,11 +41,27 @@ public class UserController : ControllerBase
 
         string sqlGetUsers = @"
             SELECT 
-                U.Id, U.Name, U.LastName, U.Email, U.PhoneNumber, U.UserName, U.PorfileImageUrl, R.Description AS Rol, U.RolId
+                U.Id, U.Name, U.LastName, U.Email, U.PhoneNumber, U.UserName, U.ProfileImageUrl, R.Description AS Rol, U.RolId
             FROM [MuevemeSchema].[User] AS U
             INNER JOIN [MuevemeSchema].[Rol] AS R ON R.Id = U.RolId
         ";
         return _dapper.FindMany<UserGetDto>(sqlGetUsers);
+    }
+
+    [HttpGet("Profile")]
+    public UserGetDto GetProfile()
+    {
+        string userId = User.FindFirst("userId")?.Value + "";
+
+        string sqlGetUserId = @$"
+            SELECT 
+                U.Id, U.Name, U.LastName, U.Email, U.PhoneNumber, U.UserName, U.ProfileImageUrl, R.Description AS Rol, U.RolId
+            FROM [MuevemeSchema].[User] AS U
+            INNER JOIN [MuevemeSchema].[Rol] AS R ON R.Id = U.RolId
+            WHERE U.Id = {userId}
+        ";
+
+        return _dapper.FindOne<UserGetDto>(sqlGetUserId);
     }
 
     [AllowAnonymous]
@@ -134,7 +150,7 @@ public class UserController : ControllerBase
                 PhoneNumber = '" + user.PhoneNumber  + @"', 
                 UserName = '" + user.UserName  + @"', 
                 RolId = '" + user.RolId  + @"', 
-                PorfileImageUrl = '" + user.PorfileImageUrl  + @"'
+                ProfileImageUrl = '" + user.ProfileImageUrl  + @"'
         ";
 
         if(user.NewPassword.Length > 0) {
